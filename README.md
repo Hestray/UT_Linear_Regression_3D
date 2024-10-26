@@ -7,7 +7,7 @@
 
 ## 26-Oct-2024
 - [x] initialized the MSE vectors with zeros and replaced the zeroes with the actual values so as to avoid concatenation and the performance drop that comes with it (check below for how to run the performance and performance parameters)
-- [ ] refactored the appr and phi functions such that we avoid loops, leading to an improvement in the performance of the code
+- [x] refactored the appr and phi functions such that we avoid loops, leading to an improvement in the performance of the code
 
 # Performance check
 1. Copy the code from the performaces_SI_proj1
