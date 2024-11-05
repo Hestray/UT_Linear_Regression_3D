@@ -1,10 +1,13 @@
 % Reset the plots and the data available
+tic % to checck elapsed time without Profiler
+
 clc
 clear all
 close all
 
-%% Load & Plot Data
+%% Load & Plot Data 
 load('./proj_fit_38.mat');
+% load('./proj_fit_07.mat');
 
 % plot the identification input values
 figure(1);
@@ -22,7 +25,7 @@ xlabel('X_1'); ylabel('X_2'); zlabel('Y'); hold on;
 %% System of Linear Equations
 % phi(x, m) function at the end of the file
 % phi represents the regressors (basis functions)
-m         = 10;
+m         = 6;
 Phi       = phi(id.X, m);
 Y_id_reshape = (reshape(id.Y', [size(id.Y, 1)*size(id.Y, 2), 1]));
 theta     = Phi \ Y_id_reshape;
@@ -37,7 +40,7 @@ title("Identification Data (MSE = " + MSE_id + ")");
 view(25, 40)
 hold off
 
-title(tiles, 'Linear Regression fitting for degree 2', 'FontSize', 16, 'FontWeight', 'bold')
+title(tiles, "Linear Regression fitting for degree " + m, 'FontSize', 16, 'FontWeight', 'bold')
 %% Validation on a Different Data Set (Validation set)
 Y_val_reshape = (reshape(val.Y', [size(val.Y, 1)*size(val.Y, 2), 1]));
 y_val_appr = phi(val.X, m) * theta;
@@ -58,51 +61,53 @@ view(25, 40)
 hold off
 
 %% Trying Various Degrees (from 1 to 35)
-m       = 1 : 25;
-size_m  = size(m, 2);
-MSE_id  = zeros(1, size_m);
-MSE_val = zeros(1, size_m);
+% m       = 1 : 25;
+% size_m  = size(m, 2);
+% MSE_id  = zeros(1, size_m);
+% MSE_val = zeros(1, size_m);
+% 
+% for i = m
+%   % calculating the MSE for Identification dataset
+%   phi_id     = phi(id.X, i);
+%   theta      = phi_id \ Y_id_reshape;
+%   y_id_appr  = phi_id * theta;
+%   MSE_id(i)  = mean((Y_id_reshape - y_id_appr) .^ 2, [1 2]);
+% 
+%   % calculating the MSE for Validation dataset
+%   phi_val    = phi(val.X, i);
+%   y_val_appr = phi_val * theta;
+%   MSE_val(i) = mean((Y_val_reshape - y_val_appr) .^ 2, [1 2]);
+% end
+% 
+% %% Plot the MSEs computed previously
+% figure(3);
+% subplot(221)
+% plot(m, MSE_id, 'LineStyle', '-', 'LineWidth', 2, 'Color', '#5F9EA0'); grid on
+% axis([1 25 0 inf])
+% xlabel('degree'); ylabel('MSE')
+% title('MSE for identification data')
+% 
+% subplot(223)
+% plot(m, MSE_val, 'LineStyle', '--', 'LineWidth', 2, 'Color', '#D2042D'); grid on
+% axis([1 25 0 inf])
+% xlabel('degree'); ylabel('MSE')
+% title('MSE for validation data')
+% 
+% subplot(2, 2, [2 4])
+% plot(m, MSE_id, 'LineStyle', '-', 'LineWidth', 2, 'Color', '#5F9EA0'); grid minor; hold on
+% plot(m, MSE_val, 'LineStyle', '--', 'LineWidth', 2, 'Color', '#D2042D')
+% legend("MSE_{id}", "MSE_{val}")
+% axis([1 25 -1 30])
+% xlabel('degree'); ylabel('MSE')
+% title('MSE comparation between datasets')
+% hold off;
+% 
+% sgtitle('MSE for varying degree', 'FontSize', 16, 'FontWeight', 'bold')
+% 
+% [id_minimum id_index]   = min(MSE_id);
+% [val_minimum val_index] = min(MSE_val);
 
-for i = m
-  % calculating the MSE for Identification dataset
-  phi_id     = phi(id.X, i);
-  theta      = phi_id \ Y_id_reshape;
-  y_id_appr  = phi_id * theta;
-  MSE_id(i)  = mean((Y_id_reshape - y_id_appr) .^ 2, [1 2]);
-
-  % calculating the MSE for Validation dataset
-  phi_val    = phi(val.X, i);
-  y_val_appr = phi_val * theta;
-  MSE_val(i) = mean((Y_val_reshape - y_val_appr) .^ 2, [1 2]);
-end
-
-%% Plot the MSEs computed previously
-figure(3);
-subplot(221)
-plot(m, MSE_id, 'LineStyle', '-', 'LineWidth', 2, 'Color', '#5F9EA0'); grid on
-% axis([1 35 0 inf])
-xlabel('degree'); ylabel('MSE')
-title('MSE for identification data')
-
-subplot(223)
-plot(m, MSE_val, 'LineStyle', '--', 'LineWidth', 2, 'Color', '#D2042D'); grid on
-% axis([1 35 0 inf])
-xlabel('degree'); ylabel('MSE')
-title('MSE for validation data')
-
-subplot(2, 2, [2 4])
-plot(m, MSE_id, 'LineStyle', '-', 'LineWidth', 2, 'Color', '#5F9EA0'); grid minor; hold on
-plot(m, MSE_val, 'LineStyle', '--', 'LineWidth', 2, 'Color', '#D2042D')
-legend("MSE_{id}", "MSE_{val}")
-% axis([1 35 -1 50])
-xlabel('degree'); ylabel('MSE')
-title('MSE comparation between datasets')
-hold off;
-
-sgtitle('MSE for varying degree', 'FontSize', 16, 'FontWeight', 'bold')
-
-[id_minimum id_index]   = min(MSE_id);
-[val_minimum val_index] = min(MSE_val);
+toc
 
 %% Function Definitions
 % "Before R2024a: Local functions in scripts must be defined at the end of the file, after the last line of script code."
@@ -129,7 +134,7 @@ function res = phi(x, m)
   size_poly = size(C_correct, 1); % get the number of rows (= number of elements of polynomial)
   res       = zeros(size_x * size_x, size_poly); % initialize phi with 0
 
-  combs = table2array(combinations(x{1, 1}, x{2, 1})); % combinations of all X1 and X2
+  combs     = table2array(combinations(x{1, 1}, x{2, 1})); % combinations of all X1 and X2
   for i = 1 : (size_x * size_x)
       line = prod(power(combs(i, :), C_correct), 2);
       res(i, :) = line';
