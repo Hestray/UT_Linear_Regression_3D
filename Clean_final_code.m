@@ -57,7 +57,7 @@ title("Validation Data (MSE = " + MSE_val + ")");
 view(25, 40)
 hold off
 
-%% Trying Various Degrees (from 1 to 35)
+%% Trying Various Degrees (from 1 to 40)
 m       = 1 : 40;
 size_m  = size(m, 2);
 MSE_id  = zeros(1, size_m);
